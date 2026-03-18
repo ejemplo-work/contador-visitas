@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contador de Visitas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet"/>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+
+    .card {
+      text-align: center;
+      padding: 60px 80px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 32px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 24px 64px rgba(0,0,0,0.4);
+      animation: fadeIn 0.8s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .label {
+      font-size: 0.9rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+      margin-bottom: 16px;
+    }
+
+    .counter {
+      font-size: clamp(5rem, 18vw, 10rem);
+      font-weight: 900;
+      line-height: 1;
+      background: linear-gradient(90deg, #a78bfa, #60a5fa, #34d399);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      min-height: 1.1em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .counter.loading {
+      font-size: 3rem;
+      opacity: 0.4;
+    }
+
+    .sublabel {
+      margin-top: 16px;
+      font-size: 1rem;
+      color: rgba(255,255,255,0.35);
+    }
+
+    .refresh-btn {
+      margin-top: 40px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.7);
+      font-size: 0.9rem;
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      padding: 12px 28px;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .refresh-btn:hover {
+      background: rgba(255,255,255,0.14);
+      color: #fff;
+      transform: translateY(-2px);
+    }
+
+    .error {
+      color: #f87171;
+      font-size: 0.9rem;
+      margin-top: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="label">Total de visitas</div>
+    <div class="counter loading" id="counter">...</div>
+    <div class="sublabel">esta página ha sido visitada</div>
+    <div class="error" id="error"></div>
+    <button class="refresh-btn" onclick="fetchVisitas()">
+      🔄 Actualizar
+    </button>
+  </div>
+
+  <script>
+    const API_URL = 'BACKEND_URL/api/visitas';
+
+    async function fetchVisitas() {
+      const el = document.getElementById('counter');
+      const err = document.getElementById('error');
+      el.classList.add('loading');
+      el.textContent = '...';
+      err.textContent = '';
+      try {
+        const res = await fetch(API_URL);
+        if (!res.ok) throw new Error('Error ' + res.status);
+        const data = await res.json();
+        el.classList.remove('loading');
+        el.textContent = data.visitas.toLocaleString('es-ES');
+      } catch (e) {
+        el.textContent = '—';
+        err.textContent = 'No se pudo conectar con el servidor.';
+      }
+    }
+
+    fetchVisitas();
+  </script>
+</body>
+</html>
